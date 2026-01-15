@@ -93,7 +93,7 @@ const SolarGallery = () => {
     ]
   }
 
-  const [selectedImage, setSelectedImage] = useState<number | null>(null)
+  const [_selectedImage, _setSelectedImage] = useState<number | null>(null)
 
   const openProjectInquiry = (projectTitle: string) => {
     const subject = encodeURIComponent(`Inquiry: ${projectTitle}`)
