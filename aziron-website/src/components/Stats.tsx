@@ -1,8 +1,8 @@
 const Stats = () => {
   const stats = [
-    { number: "7+", label: "Years Experience", suffix: "" },
-    { number: "200+", label: "Projects Completed", suffix: "" },
-    { number: "50+", label: "Happy Clients", suffix: "" },
+    { number: "10+", label: "Years Experience", suffix: "" },
+    { number: "300+", label: "Projects Completed", suffix: "" },
+    { number: "100+", label: "Happy Clients", suffix: "" },
     { number: "10MW+", label: "Solar Installed", suffix: "Capacity" },
     { number: "98%", label: "Client Satisfaction", suffix: "Rate" },
     { number: "24/7", label: "Support Available", suffix: "" }

@@ -2,6 +2,7 @@ import ContactForm from '../components/ContactForm'
 import ContactMap from '../components/ContactMap'
 import ContactHours from '../components/ContactHours'
 import ContactTeam from '../components/ContactTeam'
+import { DEFAULT_NUMBER, openWhatsApp } from '../utils/whatsapp'
 
 const ContactPage = () => {
   return (
@@ -18,7 +19,7 @@ const ContactPage = () => {
           </p>
         </div>
       </div>
-
+      
       <div className="container mx-auto px-4 py-12">
         <div className="grid lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2">

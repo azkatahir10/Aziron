@@ -5,28 +5,24 @@ const SolarServices = () => {
       description: "Complete solar solutions for homes and apartments",
       features: ["Rooftop Installation", "Grid-tied Systems", "Battery Backup", "Monitoring"],
       image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      startingPrice: "$5,000"
     },
     {
       title: "Commercial Solar",
       description: "Solar solutions for businesses and commercial buildings",
       features: ["Large-scale Systems", "Energy Management", "Tax Incentives", "ROI Analysis"],
       image: "https://images.unsplash.com/photo-1542744095-fcf48d80b0fd?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      startingPrice: "$20,000"
     },
     {
       title: "Industrial Solar Farms",
       description: "Large-scale solar installations for industrial use",
       features: ["MW-scale Projects", "Grid Integration", "Maintenance", "Performance Guarantee"],
       image: "https://images.unsplash.com/photo-1466611653911-95081537e5b7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      startingPrice: "$100,000"
     },
     {
       title: "Solar Maintenance",
       description: "Regular maintenance and repair services",
       features: ["Panel Cleaning", "System Checks", "Performance Monitoring", "Warranty Service"],
       image: "https://images.unsplash.com/photo-1754619880959-2b0528375883?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      startingPrice: "$500/year"
     }
   ]
 

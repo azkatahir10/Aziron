@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 const WhyChooseUs = () => {
   const reasons = [
     {
@@ -91,15 +93,15 @@ const WhyChooseUs = () => {
                   <span>Significant cost savings</span>
                 </li>
               </ul>
-              <a 
-                href="/about#projects" 
+              <Link 
+                to="/services/solar" 
                 className="inline-flex items-center gap-2 bg-white text-aziron-primary px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
               >
                 View More Projects
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
-              </a>
+              </Link>
             </div>
             <div className="bg-white/10 p-6 rounded-2xl backdrop-blur-sm">
               <div className="aspect-video bg-gradient-to-br from-white/20 to-transparent rounded-xl flex items-center justify-center">

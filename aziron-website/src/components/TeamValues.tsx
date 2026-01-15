@@ -67,7 +67,7 @@ const TeamValues = () => {
         <div className="mt-20 bg-gradient-to-r from-aziron-primary to-aziron-secondary rounded-3xl p-8 text-white">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-4xl md:text-5xl font-bold mb-2">7+</div>
+              <div className="text-4xl md:text-5xl font-bold mb-2">10+</div>
               <div className="text-lg">Years Combined Experience</div>
             </div>
             <div>
@@ -79,7 +79,7 @@ const TeamValues = () => {
               <div className="text-lg">Certifications</div>
             </div>
             <div>
-              <div className="text-4xl md:text-5xl font-bold mb-2">200+</div>
+              <div className="text-4xl md:text-5xl font-bold mb-2">300+</div>
               <div className="text-lg">Projects Completed</div>
             </div>
           </div>

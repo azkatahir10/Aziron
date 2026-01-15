@@ -1,4 +1,8 @@
+import { useNavigate } from 'react-router-dom'
+
 const Hero = () => {
+  const navigate = useNavigate()
+
   // Function to open email client
   const openQuoteEmail = () => {
     const companyEmail = 'aziron.enterprise@gmail.com'
@@ -8,6 +12,11 @@ const Hero = () => {
     // Try to open Gmail compose window
     const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${companyEmail}&su=${subject}&body=${body}`
     window.open(gmailUrl, '_blank')
+  }
+
+  // Function to navigate to services page
+  const goToServices = () => {
+    navigate('/services')
   }
 
   return (
@@ -34,12 +43,12 @@ const Hero = () => {
                 </svg>
                 Get Free Quote
               </button>
-              <a 
-                href="#services" 
+              <button
+                onClick={goToServices}
                 className="bg-aziron-accent text-aziron-secondary px-8 py-4 rounded-lg font-semibold hover:bg-aziron-primary hover:text-white hover:shadow-lg transition-all duration-300 text-lg"
               >
                 Our Services
-              </a>
+              </button>
             </div>
           </div>
           <div className="relative">

@@ -29,7 +29,7 @@ const SolarGallery = () => {
         description: "Shared solar system for residential complex",
         image: "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
         capacity: "25 kW",
-        location: "Dubai, UAE",
+        location: "Jeddah, Saudi Arabia",
         savings: "60% reduction"
       }
     ],
@@ -69,7 +69,7 @@ const SolarGallery = () => {
         description: "Large-scale industrial solar farm",
         image: "https://images.unsplash.com/photo-1466611653911-95081537e5b7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
         capacity: "6 MW",
-        location: "Industrial Zone, KSA",
+        location: "Lahore, Pakistan",
         savings: "40% reduction"
       },
       {

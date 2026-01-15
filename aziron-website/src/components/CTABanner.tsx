@@ -30,7 +30,7 @@ const CTABanner = () => {
             Start with Email Quote
           </button>
           <a
-            href="tel:+966501361323"
+            href="tel:+923204671763"
             className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-gray-900 transition-all duration-300 text-lg flex items-center justify-center gap-3"
           >
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
