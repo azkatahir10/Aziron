@@ -57,12 +57,9 @@ const SolarServices = () => {
                 />
               </div>
               <div className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-800 mb-2">{service.title}</h3>
-                    <p className="text-gray-600">{service.description}</p>
-                  </div>
-                  <div className="text-blue-600 font-bold text-xl">{service.startingPrice}</div>
+                <div className="mb-4">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">{service.title}</h3>
+                  <p className="text-gray-600">{service.description}</p>
                 </div>
                 
                 <div className="mb-6">

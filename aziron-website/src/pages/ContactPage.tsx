@@ -2,7 +2,8 @@ import ContactForm from '../components/ContactForm'
 import ContactMap from '../components/ContactMap'
 import ContactHours from '../components/ContactHours'
 import ContactTeam from '../components/ContactTeam'
-import { DEFAULT_NUMBER, openWhatsApp } from '../utils/whatsapp'
+// Remove this line since you're not using these imports
+// import { DEFAULT_NUMBER, openWhatsApp } from '../utils/whatsapp'
 
 const ContactPage = () => {
   return (
