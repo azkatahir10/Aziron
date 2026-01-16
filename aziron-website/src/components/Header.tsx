@@ -32,11 +32,36 @@ const Header = () => {
 
   const openQuoteEmail = () => {
     const companyEmail = 'aziron.enterprise@gmail.com'
-    const subject = encodeURIComponent('Quick Quote Request from Website')
-    const body = encodeURIComponent(`Hello AZIRON Team,\n\nI would like to request a quick quote.\n\nBest regards,\n[Your Name]`)
+    const subject = encodeURIComponent('Quick Quote Request from AZIRON Website')
+    const body = encodeURIComponent(`Hello AZIRON Team,\n\nI would like to request a quick quote for your services.\n\nPlease contact me with more information.\n\nBest regards,\n[Your Name]`)
     
-    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${companyEmail}&su=${subject}&body=${body}`
-    window.open(gmailUrl, '_blank')
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+    
+    if (isMobile || window.innerWidth < 768) {
+      // Use mailto for mobile
+      const mailtoLink = `mailto:${companyEmail}?subject=${subject}&body=${body}`
+      // Try multiple methods for mobile
+      try {
+        // Method 1: Create and click hidden anchor
+        const a = document.createElement('a')
+        a.href = mailtoLink
+        a.target = '_blank'
+        a.rel = 'noopener noreferrer'
+        a.click()
+      } catch (err) {
+        // Method 2: Use window.location as fallback
+        window.location.href = mailtoLink
+      }
+    } else {
+      // Use Gmail for desktop
+      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${companyEmail}&su=${subject}&body=${body}`
+      window.open(gmailUrl, '_blank')
+    }
+    
+    // Close mobile menu if open
+    if (window.innerWidth < 768) {
+      setIsMenuOpen(false)
+    }
   }
 
   return (
@@ -222,10 +247,7 @@ const Header = () => {
                 </button>
                 
                 <button
-                  onClick={() => {
-                    openQuoteEmail()
-                    setIsMenuOpen(false)
-                  }}
+                  onClick={openQuoteEmail}
                   className="bg-gradient-to-r from-aziron-primary to-aziron-secondary text-white py-3 rounded-lg font-semibold text-center hover:shadow-lg transition-colors duration-300 flex items-center justify-center gap-2"
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
