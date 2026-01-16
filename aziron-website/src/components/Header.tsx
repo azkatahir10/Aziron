@@ -38,20 +38,8 @@ const Header = () => {
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
     
     if (isMobile || window.innerWidth < 768) {
-      // Use mailto for mobile
-      const mailtoLink = `mailto:${companyEmail}?subject=${subject}&body=${body}`
-      // Try multiple methods for mobile
-      try {
-        // Method 1: Create and click hidden anchor
-        const a = document.createElement('a')
-        a.href = mailtoLink
-        a.target = '_blank'
-        a.rel = 'noopener noreferrer'
-        a.click()
-      } catch (err) {
-        // Method 2: Use window.location as fallback
-        window.location.href = mailtoLink
-      }
+      // Enhanced mobile email opening with multiple fallbacks
+      openMobileEmail(companyEmail, subject, body)
     } else {
       // Use Gmail for desktop
       const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${companyEmail}&su=${subject}&body=${body}`
@@ -62,6 +50,68 @@ const Header = () => {
     if (window.innerWidth < 768) {
       setIsMenuOpen(false)
     }
+  }
+
+  // Special function for mobile email opening with multiple fallbacks
+  const openMobileEmail = (email: string, subject: string, body: string) => {
+    const mailtoLink = `mailto:${email}?subject=${subject}&body=${body}`
+    const gmailAppLink = `https://mail.google.com/mail/?extsrc=mailto&url=${encodeURIComponent(mailtoLink)}`
+    
+    // Try multiple methods in sequence
+    const methods = [
+      // Method 1: Direct Gmail app link (best for Android with Gmail)
+      () => {
+        window.location.href = gmailAppLink
+        return true
+      },
+      // Method 2: Standard mailto with timeout
+      () => {
+        const a = document.createElement('a')
+        a.href = mailtoLink
+        a.target = '_blank'
+        a.rel = 'noopener noreferrer'
+        a.style.display = 'none'
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        return true
+      },
+      // Method 3: window.location fallback
+      () => {
+        window.location.href = mailtoLink
+        return true
+      },
+      // Method 4: If all else fails, show instructions
+      () => {
+        alert(`Please email us at: ${email}\n\nSubject: ${decodeURIComponent(subject)}\n\nCopy this email address and send us a message.`)
+        return false
+      }
+    ]
+
+    // Try each method with delay
+    let methodIndex = 0
+    const tryMethod = () => {
+      if (methodIndex < methods.length) {
+        try {
+          const success = methods[methodIndex]()
+          if (!success && methodIndex < methods.length - 1) {
+            // Try next method after delay
+            setTimeout(() => {
+              methodIndex++
+              tryMethod()
+            }, 500)
+          }
+        } catch (error) {
+          // Try next method on error
+          setTimeout(() => {
+            methodIndex++
+            tryMethod()
+          }, 500)
+        }
+      }
+    }
+    
+    tryMethod()
   }
 
   return (
