@@ -1,349 +1,198 @@
-import { useState } from 'react'
-import emailjs from '@emailjs/browser'
+import ContactForm from '../components/ContactForm'
+import ContactMap from '../components/ContactMap'
+import ContactHours from '../components/ContactHours'
+import ContactTeam from '../components/ContactTeam'
+import { openWhatsApp } from '../utils/whatsapp'
 
-interface ContactFormProps {
-  initialSubject?: string
-  initialMessage?: string
-}
-
-const ContactForm = ({ initialSubject = '', initialMessage = '' }: ContactFormProps) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    service: '',
-    projectType: '',
-    timeline: '',
-    message: initialMessage,
-    subject: initialSubject
-  })
-
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [error, setError] = useState('')
-
-  // ⭐ EMAILJS CONFIGURATION - UPDATE THESE VALUES ⭐
-  const EMAILJS_CONFIG = {
-    SERVICE_ID: 'service_1ristks', // Your Service ID from screenshot
-    TEMPLATE_ID: 'template_l11ox5k', // Get from EmailJS dashboard
-    PUBLIC_KEY: 'lV85dNEjDx1-FB7G6', // Get from EmailJS → API Keys
-    TO_EMAIL: 'aziron.enterprise@gmail.com' // Your email address
+const ContactPage = () => {
+  // WhatsApp numbers for different departments
+  const whatsappNumbers = {
+    general: '+923204671763', // Basit's number for general inquiries
+    sales: '+966501361323',   // Haider's number for sales
+    support: '+923204671763', // Basit's number for support
+    technical: '+923224773766' // Anum's number for technical
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
+  const openGeneralWhatsApp = () => {
+    const message = 'Hello AZIRON Team, I would like to get more information about your services.'
+    openWhatsApp(whatsappNumbers.general, message)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setError('')
-
-    try {
-      // Send email to YOUR aziron.enterprise@gmail.com account
-      const result = await emailjs.send(
-        EMAILJS_CONFIG.SERVICE_ID,
-        EMAILJS_CONFIG.TEMPLATE_ID,
-        {
-          to_email: EMAILJS_CONFIG.TO_EMAIL, // This ensures email goes to you
-          from_name: formData.name,
-          from_email: formData.email,
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone || 'Not provided',
-          service: formData.service || 'Not specified',
-          projectType: formData.projectType || 'Not specified',
-          timeline: formData.timeline || 'Not specified',
-          subject: formData.subject || `Contact Form: ${formData.service || 'General Inquiry'}`,
-          message: formData.message,
-          date: new Date().toLocaleDateString(),
-          time: new Date().toLocaleTimeString()
-        },
-        EMAILJS_CONFIG.PUBLIC_KEY
-      )
-
-      if (result.text === 'OK') {
-        setIsSubmitted(true)
-        // Reset form
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          service: '',
-          projectType: '',
-          timeline: '',
-          message: '',
-          subject: ''
-        })
-        
-        // Auto-hide success message after 5 seconds
-        setTimeout(() => setIsSubmitted(false), 5000)
-      } else {
-        setError('Failed to send message. Please try again.')
-      }
-    } catch (err) {
-      console.error('EmailJS error:', err)
-      setError('Failed to send message. Please try again or email us directly.')
-    } finally {
-      setIsSubmitting(false)
-    }
+  const openSalesWhatsApp = () => {
+    const message = 'Hello AZIRON Sales Team, I would like to discuss solar energy solutions and get a quote.'
+    openWhatsApp(whatsappNumbers.sales, message)
   }
 
-  const openQuickInquiry = (type: string) => {
-    // Fallback to Gmail for quick inquiries
-    const subject = encodeURIComponent(`Quick ${type} Inquiry`)
-    const body = encodeURIComponent(`Hello AZIRON Team,\n\nI'm interested in ${type}.\n\nPlease send me:\n• Service information\n• Pricing details\n• Availability\n\nBest regards,\n[Your Name]`)
-    
-    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${EMAILJS_CONFIG.TO_EMAIL}&su=${subject}&body=${body}`, '_blank')
+  const openTechnicalWhatsApp = () => {
+    const message = 'Hello AZIRON Technical Team, I have technical questions about your construction services.'
+    openWhatsApp(whatsappNumbers.technical, message)
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-8">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-aziron-secondary mb-2">Send Us a Message</h2>
-        <p className="text-gray-600">Fill out the form below and we'll respond within 24 hours</p>
-      </div>
-
-      {/* Quick Inquiry Buttons */}
-      <div className="mb-8">
-        <h3 className="font-semibold text-gray-700 mb-4">Quick Inquiries:</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <button
-            onClick={() => openQuickInquiry('Solar Installation')}
-            className="bg-aziron-light text-aziron-secondary py-2 px-3 rounded-lg hover:bg-aziron-accent transition-colors text-sm"
-          >
-            Solar Quote
-          </button>
-          <button
-            onClick={() => openQuickInquiry('Construction')}
-            className="bg-aziron-light text-aziron-secondary py-2 px-3 rounded-lg hover:bg-aziron-accent transition-colors text-sm"
-          >
-            Construction
-          </button>
-          <button
-            onClick={() => openQuickInquiry('Consultation')}
-            className="bg-aziron-light text-aziron-secondary py-2 px-3 rounded-lg hover:bg-aziron-accent transition-colors text-sm"
-          >
-            Consultation
-          </button>
-          <button
-            onClick={() => openQuickInquiry('Maintenance')}
-            className="bg-aziron-light text-aziron-secondary py-2 px-3 rounded-lg hover:bg-aziron-accent transition-colors text-sm"
-          >
-            Maintenance
-          </button>
-        </div>
-      </div>
-
-      {/* Success/Error Messages */}
-      {isSubmitted && (
-        <div className="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
-          ✅ Message sent successfully to AZIRON team! We'll respond within 24 hours.
-        </div>
-      )}
-
-      {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-          ⚠️ {error}
-          <div className="mt-2 text-sm">
-            You can also email us directly at: <a href={`mailto:${EMAILJS_CONFIG.TO_EMAIL}`} className="underline">{EMAILJS_CONFIG.TO_EMAIL}</a>
-          </div>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Form fields remain exactly the same as before */}
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-gray-700 mb-2 font-medium">
-              Full Name *
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-aziron-primary focus:border-transparent transition-all"
-              placeholder="John Smith"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 mb-2 font-medium">
-              Email Address *
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-aziron-primary focus:border-transparent transition-all"
-              placeholder="john@example.com"
-            />
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-gray-700 mb-2 font-medium">
-              Phone Number
-            </label>
-            <input
-              type="tel"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-aziron-primary focus:border-transparent transition-all"
-              placeholder="+966 123 456 789"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 mb-2 font-medium">
-              Service Interest *
-            </label>
-            <select
-              name="service"
-              value={formData.service}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-aziron-primary focus:border-transparent transition-all"
-            >
-              <option value="">Select a service</option>
-              <option value="Solar Installation">Solar Panel Installation</option>
-              <option value="Energy Storage">Energy Storage Solutions</option>
-              <option value="Construction">Construction Services</option>
-              <option value="Renovation">Renovations & Remodeling</option>
-              <option value="Consultation">Consultation & Design</option>
-              <option value="Maintenance">Maintenance Services</option>
-              <option value="Multiple Services">Multiple Services</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-gray-700 mb-2 font-medium">
-              Project Type
-            </label>
-            <select
-              name="projectType"
-              value={formData.projectType}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-aziron-primary focus:border-transparent transition-all"
-            >
-              <option value="">Select project type</option>
-              <option value="Residential">Residential</option>
-              <option value="Commercial">Commercial</option>
-              <option value="Industrial">Industrial</option>
-              <option value="Government">Government/Municipal</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-gray-700 mb-2 font-medium">
-              Timeline
-            </label>
-            <select
-              name="timeline"
-              value={formData.timeline}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-aziron-primary focus:border-transparent transition-all"
-            >
-              <option value="">Select timeline</option>
-              <option value="Immediate">Immediate (Within 1 month)</option>
-              <option value="1-3 Months">1-3 Months</option>
-              <option value="3-6 Months">3-6 Months</option>
-              <option value="6+ Months">6+ Months (Planning)</option>
-              <option value="Not Sure">Not Sure Yet</option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-gray-700 mb-2 font-medium">
-            Subject *
-          </label>
-          <input
-            type="text"
-            name="subject"
-            value={formData.subject}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-aziron-primary focus:border-transparent transition-all"
-            placeholder="What would you like to discuss?"
-          />
-        </div>
-
-        <div>
-          <label className="block text-gray-700 mb-2 font-medium">
-            Your Message *
-          </label>
-          <textarea
-            name="message"
-            value={formData.message}
-            onChange={handleChange}
-            required
-            rows={6}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-aziron-primary focus:border-transparent transition-all resize-none"
-            placeholder="Please describe your project requirements, location, specific needs, and any questions you have..."
-          />
-        </div>
-
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className={`bg-gradient-to-r from-aziron-primary to-aziron-secondary text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3 flex-1 ${
-              isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-xl'
-            }`}
-          >
-            {isSubmitting ? (
-              <>
-                <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Sending to AZIRON...
-              </>
-            ) : (
-              <>
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                  <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                </svg>
-                Send to AZIRON Team
-              </>
-            )}
-          </button>
+    <div className="pt-8 pb-20">
+      {/* Hero Section for Contact Page */}
+      <div className="bg-gradient-to-r from-aziron-primary/10 to-aziron-accent/10 py-16">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-aziron-secondary mb-6">
+            Get in <span className="text-aziron-primary">Touch</span>
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            We're here to help with your energy and construction projects. 
+            Reach out for consultations, quotes, or general inquiries.
+          </p>
           
-          <div className="text-center md:text-left">
-            <p className="text-sm text-gray-600">
-              Directly to: aziron.enterprise@gmail.com
-            </p>
-            <p className="text-xs text-gray-500">
-              Secure & encrypted delivery
-            </p>
+          {/* Quick Contact Buttons */}
+          <div className="flex flex-wrap justify-center gap-4 mt-8">
+            <button
+              onClick={openGeneralWhatsApp}
+              className="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.76.982.998-3.675-.236-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.9 6.994c-.004 5.45-4.438 9.88-9.888 9.88m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.333.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.333 11.893-11.893 0-3.18-1.24-6.162-3.495-8.411"/>
+              </svg>
+              Chat on WhatsApp
+            </button>
+            
+            <a
+              href="tel:+923204671763"
+              className="bg-gradient-to-r from-aziron-primary to-aziron-secondary text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+              </svg>
+              Call Now
+            </a>
+            
+            <a
+              href="mailto:aziron.enterprise@gmail.com"
+              className="bg-aziron-accent text-aziron-secondary px-6 py-3 rounded-lg font-semibold hover:bg-aziron-primary hover:text-white hover:shadow-lg transition-all duration-300 flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+              </svg>
+              Send Email
+            </a>
           </div>
         </div>
-      </form>
+      </div>
 
-      <div className="mt-8 pt-8 border-t border-gray-200">
-        <div className="grid md:grid-cols-3 gap-4 text-center">
-          <div>
-            <div className="text-2xl font-bold text-aziron-primary">24h</div>
-            <div className="text-sm text-gray-600">Response Time</div>
+      {/* Main Contact Section */}
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid lg:grid-cols-3 gap-12">
+          <div className="lg:col-span-2">
+            <ContactForm 
+              initialSubject="New Project Inquiry"
+              initialMessage="Hello AZIRON Team, I would like to discuss:• Project Type: Location: \n• Timeline: \n• Budget Range: \n• Specific Requirements: \n\nPlease contact me to schedule a consultation.\n\nBest regards,\n[Your Name]"
+            />
           </div>
-          <div>
-            <div className="text-2xl font-bold text-aziron-primary">100%</div>
-            <div className="text-sm text-gray-600">Privacy Protected</div>
+          <div className="space-y-8">
+            <ContactHours />
+            <ContactTeam />
+            
+            {/* WhatsApp Quick Links */}
+            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6">
+              <h3 className="text-2xl font-bold text-green-800 mb-4">Quick WhatsApp Support</h3>
+              <div className="space-y-4">
+                <button
+                  onClick={openGeneralWhatsApp}
+                  className="w-full bg-white text-green-700 py-3 px-4 rounded-lg font-semibold hover:bg-green-50 transition-colors flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-3">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.76.982.998-3.675-.236-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.9 6.994c-.004 5.45-4.438 9.88-9.888 9.88m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.333.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.333 11.893-11.893 0-3.18-1.24-6.162-3.495-8.411"/>
+                    </svg>
+                    <span>General Inquiries</span>
+                  </div>
+                  <span className="text-sm">+92 3204671763</span>
+                </button>
+                
+                <button
+                  onClick={openSalesWhatsApp}
+                  className="w-full bg-white text-green-700 py-3 px-4 rounded-lg font-semibold hover:bg-green-50 transition-colors flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-3">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.76.982.998-3.675-.236-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.9 6.994c-.004 5.45-4.438 9.88-9.888 9.88m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.333.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.333 11.893-11.893 0-3.18-1.24-6.162-3.495-8.411"/>
+                    </svg>
+                    <span>Solar & Energy Sales</span>
+                  </div>
+                  <span className="text-sm">+966 501361323</span>
+                </button>
+                
+                <button
+                  onClick={openTechnicalWhatsApp}
+                  className="w-full bg-white text-green-700 py-3 px-4 rounded-lg font-semibold hover:bg-green-50 transition-colors flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-3">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.76.982.998-3.675-.236-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.9 6.994c-.004 5.45-4.438 9.88-9.888 9.88m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.333.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.333 11.893-11.893 0-3.18-1.24-6.162-3.495-8.411"/>
+                    </svg>
+                    <span>Technical Support</span>
+                  </div>
+                  <span className="text-sm">+92 3224773766</span>
+                </button>
+              </div>
+              
+              <div className="mt-6 pt-6 border-t border-green-200">
+                <p className="text-sm text-green-700">
+                  <strong>Note:</strong> WhatsApp messages typically receive responses within 1-2 hours during business hours.
+                </p>
+              </div>
+            </div>
           </div>
-          <div>
-            <div className="text-2xl font-bold text-aziron-primary">Direct</div>
-            <div className="text-sm text-gray-600">To AZIRON Team</div>
+        </div>
+      </div>
+
+      <ContactMap />
+      
+      {/* Additional Contact Options */}
+      <div className="container mx-auto px-4 py-12">
+        <div className="bg-gradient-to-r from-aziron-primary to-aziron-secondary rounded-3xl p-8 md:p-12 text-white">
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="text-4xl mb-4">📞</div>
+              <h3 className="text-2xl font-bold mb-3">Phone Support</h3>
+              <div className="space-y-2">
+                <a href="tel:+966501361323" className="block text-lg hover:text-aziron-accent transition-colors">
+                  +966 501361323
+                </a>
+                <a href="tel:+923204671763" className="block text-lg hover:text-aziron-accent transition-colors">
+                  +92 3204671763
+                </a>
+                <a href="tel:+923224773766" className="block text-lg hover:text-aziron-accent transition-colors">
+                  +92 3224773766
+                </a>
+              </div>
+              <p className="mt-4 text-aziron-light">Available 8 AM - 6 PM (GMT+3)</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-4xl mb-4">📧</div>
+              <h3 className="text-2xl font-bold mb-3">Email Support</h3>
+              <a 
+                href="mailto:aziron.enterprise@gmail.com" 
+                className="text-lg hover:text-aziron-accent transition-colors break-all block"
+              >
+                aziron.enterprise@gmail.com
+              </a>
+              <p className="mt-4 text-aziron-light">Response within 24 hours</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-4xl mb-4">💬</div>
+              <h3 className="text-2xl font-bold mb-3">Instant Support</h3>
+              <button
+                onClick={openGeneralWhatsApp}
+                className="bg-white text-aziron-primary px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center gap-2 mx-auto"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.76.982.998-3.675-.236-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.9 6.994c-.004 5.45-4.438 9.88-9.888 9.88m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.333.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.333 11.893-11.893 0-3.18-1.24-6.162-3.495-8.411"/>
+                </svg>
+                Start WhatsApp Chat
+              </button>
+              <p className="mt-4 text-aziron-light">Fastest response time</p>
+            </div>
           </div>
         </div>
       </div>
@@ -351,4 +200,4 @@ const ContactForm = ({ initialSubject = '', initialMessage = '' }: ContactFormPr
   )
 }
 
-export default ContactForm
+export default ContactPage

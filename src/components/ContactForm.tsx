@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import emailjs from '@emailjs/browser'
 
 interface ContactFormProps {
   initialSubject?: string
@@ -17,7 +18,17 @@ const ContactForm = ({ initialSubject = '', initialMessage = '' }: ContactFormPr
     subject: initialSubject
   })
 
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [error, setError] = useState('')
+
+  // ⭐ EMAILJS CONFIGURATION - UPDATE THESE VALUES ⭐
+  const EMAILJS_CONFIG = {
+    SERVICE_ID: 'service_1ristks', // Your Service ID from screenshot
+    TEMPLATE_ID: 'template_l11ox5k', // Get from EmailJS dashboard
+    PUBLIC_KEY: 'lV85dNEjDx1-FB7G6', // Get from EmailJS → API Keys
+    TO_EMAIL: 'aziron.enterprise@gmail.com' // Your email address
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
@@ -26,56 +37,74 @@ const ContactForm = ({ initialSubject = '', initialMessage = '' }: ContactFormPr
     })
   }
 
-  const openEmailClient = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    const companyEmail = 'aziron.enterprise@gmail.com'
-    const subject = encodeURIComponent(formData.subject || `Contact Form: ${formData.service || 'General Inquiry'}`)
-    
-    let body = `CONTACT FORM SUBMISSION\n`
-    body += `======================\n\n`
-    if (formData.name) body += `Name: ${formData.name}\n`
-    if (formData.email) body += `Email: ${formData.email}\n`
-    if (formData.phone) body += `Phone: ${formData.phone}\n`
-    if (formData.service) body += `Service Interest: ${formData.service}\n`
-    if (formData.projectType) body += `Project Type: ${formData.projectType}\n`
-    if (formData.timeline) body += `Timeline: ${formData.timeline}\n\n`
-    if (formData.message) body += `Message:\n${formData.message}\n\n`
-    body += `---\nSubmitted via AZIRON Website Contact Form`
-    
-    const encodedBody = encodeURIComponent(body)
-    
-    window.location.href = `mailto:${companyEmail}?subject=${subject}&body=${encodedBody}`
-    setIsSubmitted(true)
-    
-    // Reset form after a delay
-    setTimeout(() => {
-      setIsSubmitted(false)
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        service: '',
-        projectType: '',
-        timeline: '',
-        message: '',
-        subject: ''
-      })
-    }, 3000)
+    setIsSubmitting(true)
+    setError('')
+
+    try {
+      // Send email to YOUR aziron.enterprise@gmail.com account
+      const result = await emailjs.send(
+        EMAILJS_CONFIG.SERVICE_ID,
+        EMAILJS_CONFIG.TEMPLATE_ID,
+        {
+          to_email: EMAILJS_CONFIG.TO_EMAIL, // This ensures email goes to you
+          from_name: formData.name,
+          from_email: formData.email,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone || 'Not provided',
+          service: formData.service || 'Not specified',
+          projectType: formData.projectType || 'Not specified',
+          timeline: formData.timeline || 'Not specified',
+          subject: formData.subject || `Contact Form: ${formData.service || 'General Inquiry'}`,
+          message: formData.message,
+          date: new Date().toLocaleDateString(),
+          time: new Date().toLocaleTimeString()
+        },
+        EMAILJS_CONFIG.PUBLIC_KEY
+      )
+
+      if (result.text === 'OK') {
+        setIsSubmitted(true)
+        // Reset form
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          service: '',
+          projectType: '',
+          timeline: '',
+          message: '',
+          subject: ''
+        })
+        
+        // Auto-hide success message after 5 seconds
+        setTimeout(() => setIsSubmitted(false), 5000)
+      } else {
+        setError('Failed to send message. Please try again.')
+      }
+    } catch (err) {
+      console.error('EmailJS error:', err)
+      setError('Failed to send message. Please try again or email us directly.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const openQuickInquiry = (type: string) => {
+    // Fallback to Gmail for quick inquiries
     const subject = encodeURIComponent(`Quick ${type} Inquiry`)
     const body = encodeURIComponent(`Hello AZIRON Team,\n\nI'm interested in ${type}.\n\nPlease send me:\n• Service information\n• Pricing details\n• Availability\n\nBest regards,\n[Your Name]`)
     
-    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=aziron.enterprise@gmail.com&su=${subject}&body=${body}`, '_blank')
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${EMAILJS_CONFIG.TO_EMAIL}&su=${subject}&body=${body}`, '_blank')
   }
 
   return (
     <div className="bg-white rounded-2xl shadow-xl p-8">
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-aziron-secondary mb-2">Send Us a Message</h2>
-        <p className="text-gray-600">Fill out the form below and we'll open your email client with all information pre-filled</p>
+        <p className="text-gray-600">Fill out the form below and we'll respond within 24 hours</p>
       </div>
 
       {/* Quick Inquiry Buttons */}
@@ -109,13 +138,24 @@ const ContactForm = ({ initialSubject = '', initialMessage = '' }: ContactFormPr
         </div>
       </div>
 
+      {/* Success/Error Messages */}
       {isSubmitted && (
         <div className="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
-          ✅ Opening your email client... Please check for a new email draft.
+          ✅ Message sent successfully to AZIRON team! We'll respond within 24 hours.
         </div>
       )}
 
-      <form onSubmit={openEmailClient} className="space-y-6">
+      {error && (
+        <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          ⚠️ {error}
+          <div className="mt-2 text-sm">
+            You can also email us directly at: <a href={`mailto:${EMAILJS_CONFIG.TO_EMAIL}`} className="underline">{EMAILJS_CONFIG.TO_EMAIL}</a>
+          </div>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Form fields remain exactly the same as before */}
         <div className="grid md:grid-cols-2 gap-6">
           <div>
             <label className="block text-gray-700 mb-2 font-medium">
@@ -256,21 +296,36 @@ const ContactForm = ({ initialSubject = '', initialMessage = '' }: ContactFormPr
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
           <button
             type="submit"
-            className="bg-gradient-to-r from-aziron-primary to-aziron-secondary text-white px-8 py-4 rounded-lg font-semibold hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3 flex-1"
+            disabled={isSubmitting}
+            className={`bg-gradient-to-r from-aziron-primary to-aziron-secondary text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3 flex-1 ${
+              isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-xl'
+            }`}
           >
-            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-              <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-            </svg>
-            Open in Email Client
+            {isSubmitting ? (
+              <>
+                <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Sending to AZIRON...
+              </>
+            ) : (
+              <>
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                  <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                </svg>
+                Send to AZIRON Team
+              </>
+            )}
           </button>
           
           <div className="text-center md:text-left">
             <p className="text-sm text-gray-600">
-              This will open your default email client
+              Directly to: aziron.enterprise@gmail.com
             </p>
             <p className="text-xs text-gray-500">
-              To: aziron.enterprise@gmail.com
+              Secure & encrypted delivery
             </p>
           </div>
         </div>
@@ -287,8 +342,8 @@ const ContactForm = ({ initialSubject = '', initialMessage = '' }: ContactFormPr
             <div className="text-sm text-gray-600">Privacy Protected</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-aziron-primary">Free</div>
-            <div className="text-sm text-gray-600">Consultation</div>
+            <div className="text-2xl font-bold text-aziron-primary">Direct</div>
+            <div className="text-sm text-gray-600">To AZIRON Team</div>
           </div>
         </div>
       </div>
